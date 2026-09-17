@@ -1,5 +1,30 @@
 # Mini Hackathon AI — Batch 04 · Lớp 3A
 
+## Chạy Classroom Summary Bot
+
+Xem hướng dẫn đầy đủ tại [`docs/SETUP.md`](docs/SETUP.md).
+
+Bot dùng Python 3.11+, PostgreSQL và Redis. Sao chép `.env.example` thành `.env`, điền
+Discord token cùng DeepSeek API key, sau đó chạy:
+
+```bash
+docker compose up --build -d
+```
+
+Phát triển trực tiếp trên máy:
+
+```bash
+python -m pip install -e '.[dev]'
+alembic upgrade head
+pytest
+ruff check .
+mypy src
+```
+
+Trong Discord, quản trị viên dùng `/summary enable min_messages:<số>` để opt-in channel,
+`/summary now` để nhận bản tóm tắt ephemeral và `/summary disable` để tắt. Scheduler đăng
+milestone công khai lúc 09:00, 14:00 và 21:00 theo múi giờ cấu hình.
+
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
 ## 👥 Thành viên nhóm & Phân công vai trò
