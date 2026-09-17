@@ -8,7 +8,7 @@ from redis.asyncio import Redis
 
 from classroom_summary.config import Settings
 from classroom_summary.jobs.lock import RedisLock
-from classroom_summary.process.pipeline import SummaryPipeline
+from classroom_summary.process.pipeline import SUMMARY_PROMPT_VERSION, SummaryPipeline
 from classroom_summary.process.schemas import SummaryOutput
 from classroom_summary.process.source import MessageSource
 from classroom_summary.storage.channels import get_channel_config
@@ -56,7 +56,7 @@ class OnDemandRunner:
             stored_cursor = await get_cursor(session, channel_id)
             cursor = stored_cursor or config.activated_after_message_id
 
-        cache_key = f"cache:ondemand:{channel_id}:{cursor}"
+        cache_key = f"cache:ondemand:{SUMMARY_PROMPT_VERSION}:{channel_id}:{cursor}"
         cached = await self.redis.get(cache_key)
         if cached:
             return SummaryOutput.model_validate_json(cached)

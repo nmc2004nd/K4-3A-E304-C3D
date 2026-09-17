@@ -13,6 +13,13 @@ from classroom_summary.process.schemas import SummaryOutput
 from classroom_summary.storage.models import Summary
 from classroom_summary.storage.summaries import get_summary_for_range, save_summary
 
+SUMMARY_PROMPT_VERSION = "vi-v1"
+VIETNAMESE_OUTPUT_INSTRUCTION = (
+    "Write every human-readable output field in Vietnamese, including overview, title, "
+    "and detail. Keep proper nouns, technical terms, code, URLs, and quoted source text "
+    "unchanged when appropriate."
+)
+
 
 @dataclass(frozen=True)
 class PipelineResult:
@@ -41,7 +48,10 @@ class SummaryPipeline:
             raise ValueError("cannot summarize an empty message range")
         cursor_to = messages[-1].message_id
         canonical = json.dumps(
-            [message.model_dump(mode="json") for message in messages],
+            {
+                "prompt_version": SUMMARY_PROMPT_VERSION,
+                "messages": [message.model_dump(mode="json") for message in messages],
+            },
             sort_keys=True,
             separators=(",", ":"),
         )
@@ -97,7 +107,7 @@ class SummaryPipeline:
         last_error: ValidationError | None = None
         for _ in range(3):
             response = await self.provider.generate_json(
-                system=system,
+                system=f"{system}\n\n{VIETNAMESE_OUTPUT_INSTRUCTION}",
                 user=prompt,
                 json_schema=SummaryOutput.model_json_schema(),
             )
