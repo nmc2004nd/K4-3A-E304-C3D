@@ -163,9 +163,8 @@ Một case chỉ pass khi đồng thời:
 
 ### Quality bar đã khóa
 
-> **Sản phẩm đạt khi ít nhất 21/24 case (87,5%) pass; đồng thời 100% case hard-gate về không bịa fact/deadline, cô lập channel, post thất bại không nhảy cursor và on-demand không ghi cursor phải pass. Toàn bộ unit test, Ruff và mypy phải xanh.**
+> **Sản phẩm đạt khi ít nhất 21/24 case pass; đồng thời 100% case hard-gate về không bịa fact/deadline, cô lập channel, post thất bại không nhảy cursor và on-demand không ghi cursor phải pass. Toàn bộ unit test, Ruff và mypy phải xanh.**
 
-Không được hạ quality bar sau hạn CP4. Nếu kết quả thấp hơn, nhóm báo đúng số thực, phân tích lỗi và tiếp tục cải thiện.
 
 ## §8. Phân công và kế hoạch
 
