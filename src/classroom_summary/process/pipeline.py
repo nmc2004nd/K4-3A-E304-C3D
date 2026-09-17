@@ -13,7 +13,44 @@ from classroom_summary.process.schemas import SummaryOutput
 from classroom_summary.storage.models import Summary
 from classroom_summary.storage.summaries import get_summary_for_range, save_summary
 
-SUMMARY_PROMPT_VERSION = "vi-v1"
+SUMMARY_PROMPT_VERSION = "vi-v2"
+
+CLASSROOM_SYSTEM_PROMPT = (
+    "You are a classroom message summarizer for an educational Discord server. "
+    "Your job is to extract academically relevant information and filter out pure noise.\n\n"
+    "## CRITICAL RULES:\n"
+    "1. **IGNORE pure social noise**: greetings (hello, chào), emoji spam (🚀🚀), "
+    "game invitations (csgo, lol), food/lunch plans, sports commentary, and "
+    "purely social conversations. These produce ZERO items.\n"
+    "2. **KEEP academic content even in informal language**: Students often discuss "
+    "homework, assignments, code errors, exams, deadlines, and project tasks using "
+    "slang, teencode, or mixed Vietnamese-English. This is STILL academic content. "
+    "Examples: 'btap hnay ntn' (bài tập hôm nay như thế nào) = academic, "
+    "'push code lên master' = academic, 'cái này lỗi rồi' = academic.\n"
+    "3. **GROUP related Q&A into ONE item**: When a question and its answer discuss "
+    "the same topic, merge into ONE item. Do NOT create separate items for a question "
+    "and its reply.\n"
+    "4. **Skip truly meaningless fragments**: 'Làm sao?' or 'Nhanh lên' with zero "
+    "academic context should be IGNORED.\n"
+    "5. **Merge by topic**: If multiple messages discuss the same subject, combine into "
+    "a single item.\n"
+    "6. **Skip courtesy-only messages**: 'Cảm ơn thầy' alone is NOT a separate item. "
+    "But if it accompanies academic content (like exam scores), only extract the academic part.\n"
+    "7. **Be balanced**: Extract all genuine academic info, but avoid splitting one topic "
+    "into multiple items.\n\n"
+    "## NOISE (0 items):\n"
+    "- Pure greetings, emoji spam, gaming, food, sports\n"
+    "- Context-less fragments ('Làm sao?', 'Ok chốt')\n\n"
+    "## ACADEMIC (extract as items):\n"
+    "- Homework questions/answers, assignment deadlines\n"
+    "- Code errors, technical Q&A, debugging help\n"
+    "- Exam schedules, course announcements\n"
+    "- Project progress updates, task assignments\n"
+    "- Bug reports, sprint reviews, code reviews (even in informal language)\n"
+    "- Score/grade announcements\n\n"
+    "If all messages are noise, return {\"overview\": \"Không có thông tin học tập liên quan.\", \"items\": []}"
+)
+
 VIETNAMESE_OUTPUT_INSTRUCTION = (
     "Write every human-readable output field in Vietnamese, including overview, title, "
     "and detail. Keep proper nouns, technical terms, code, URLs, and quoted source text "
@@ -71,7 +108,7 @@ class SummaryPipeline:
         for start in range(0, len(messages), self.chunk_size):
             chunk = messages[start : start + self.chunk_size]
             output, tokens, model = await self._generate(
-                "Summarize only the supplied classroom messages. Never invent rules or facts.",
+                CLASSROOM_SYSTEM_PROMPT,
                 json.dumps([item.model_dump(mode="json") for item in chunk], ensure_ascii=False),
             )
             total_tokens += tokens

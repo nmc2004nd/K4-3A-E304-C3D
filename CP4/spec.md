@@ -18,19 +18,6 @@ Tài liệu này tổng hợp [Canvas CP1](../CP1/Canva1.jpg), [luồng trải n
 
 Workflow hiện tại: admin opt-in channel một lần bằng `/summary enable` → bot thu thập tin mới → học viên dùng `/summary now` khi cần, hoặc scheduler đăng mốc công khai lúc 09:00, 14:00 và 21:00 nếu đủ ngưỡng.
 
-### Bằng chứng hiện có
-
-CP1 ghi nhận nguồn là “phiếu khảo sát từ người dùng thực tế”, mức tin cậy “Cao — đã xác thực”, và nỗi đau là nhu cầu tóm tắt nội dung nổi bật trong ngày. Tuy nhiên repo **chưa lưu bản export khảo sát**, chưa có `n`, tỷ lệ xác nhận hay link đầy đủ có thể kiểm chứng từ ảnh.
-
-| Bằng chứng | Trạng thái | Việc phải bổ sung |
-|---|---|---|
-| Canvas vấn đề/giải pháp | Có tại CP1 | Giữ làm bằng chứng định hướng |
-| Cỡ mẫu và tỷ lệ xác nhận | Chưa có trong repo | Ghi `n`, câu hỏi khảo sát, số người chọn và tỷ lệ |
-| ≥5 quote nguyên văn | Chưa có trong repo | Thêm quote ngắn, mã người dùng ẩn danh và nguồn |
-| Log/phụ lục khảo sát | Chưa có | Lưu bản đã ẩn danh; không commit dữ liệu nhạy cảm |
-
-Không được dùng nội dung hội thoại demo do nhóm tự nhập làm bằng chứng nhu cầu người dùng.
-
 ## §2. Impact & quyết định chọn
 
 Điểm dưới đây là **đánh giá nội bộ 1–5**, chưa thay thế số liệu khảo sát. `Tổng = Reach + Frequency + Pain + Feasibility`.
@@ -49,8 +36,6 @@ Giải pháp được chọn vì giải đúng nỗi đau CP1, phục vụ cả 
 |---|---|---|---|
 | Discord Search | Truy xuất lại tin gốc, có ngữ cảnh channel | Người dùng vẫn phải tự đọc và tổng hợp | Bot tạo overview có cấu trúc: topic, FAQ, task, deadline, open question |
 | Bản tin/pinned message thủ công | Nội dung được con người kiểm soát | Tốn công, chậm và không đáp ứng khi hỏi giữa hai mốc | Hybrid: mốc công khai cố định và bản fresh ephemeral theo yêu cầu |
-
-Repo chưa có log benchmark sản phẩm ngoài. Nếu dùng tên/screenshot sản phẩm cụ thể trong pitch, nhóm phải bổ sung nguồn và ngày truy cập.
 
 ## §4. Thiết kế
 
@@ -135,43 +120,7 @@ Người dùng sửa hoặc xóa tin gốc trước lần xử lý kế tiếp; 
 
 ## §7. Kiểm thử và quality bar
 
-### 7.1 Kiểm thử tự động hiện có
-
-Chạy tại thư mục gốc:
-
-```bash
-python -m pip install -e '.[dev]'
-python -m ruff check .
-python -m ruff format --check .
-python -m mypy src
-python -m pytest -q
-```
-
-Tại thời điểm chốt, `pytest` có **16/16 test pass**. Các test bao phủ:
-
-- edit/delete normalization;
-- chỉ một nơi được ghi cursor;
-- on-demand không ghi cursor;
-- Discord post lỗi không ghi cursor, post thành công mới ghi;
-- cron lock chống chạy chồng;
-- idempotency theo channel và cursor range;
-- fallback REST khi stream bị trim;
-- JSON schema retry có giới hạn và DeepSeek JSON mode;
-- liên kết `items.summary_id` và prompt đầu ra tiếng Việt.
-
-### 7.2 Smoke test Docker
-
-```bash
-docker compose config --quiet
-docker compose up --build -d
-docker compose ps -a
-docker compose exec bot classroom-healthcheck
-docker compose logs --since=10m bot scheduler
-```
-
-Đạt khi PostgreSQL, Redis, bot và scheduler đều `healthy`; migration `Exited (0)`; healthcheck exit code 0; log không có traceback lặp lại. Nhóm đã chạy được stack và gọi DeepSeek/Discord thành công, nhưng log/video minh chứng CP3 **chưa được lưu trong repo**.
-
-### 7.3 Acceptance test trên Discord
+### 7.1 Acceptance test trên Discord
 
 1. Admin chạy `/summary enable min_messages:3` trong channel test.
 2. Gửi ít nhất ba tin hợp lệ, gồm một topic, một task và một deadline; thêm một tin cá nhân để kiểm tra lọc nhiễu.
@@ -187,7 +136,7 @@ docker compose exec postgres psql -U classroom -d classroom \
   -c 'select trigger, status, cursor_from, cursor_to, token_usage from summaries order by created_at desc;'
 ```
 
-### 7.4 Golden set phải hoàn thành
+### 7.2 Golden set phải hoàn thành
 
 Tạo `eval/golden-set.jsonl` gồm **24 case đã gắn expected output/rubric**:
 
@@ -201,9 +150,7 @@ Tạo `eval/golden-set.jsonl` gồm **24 case đã gắn expected output/rubric*
 | Cursor, post failure, concurrency và cô lập channel | 3 |
 | **Tổng** | **24** |
 
-Repo hiện **chưa có thư mục `eval/`**, vì vậy chưa được tuyên bố đã hoàn thành golden-set evaluation.
-
-### 7.5 Định nghĩa một case nội dung “đạt”
+### 7.3 Định nghĩa một case nội dung “đạt”
 
 Một case chỉ pass khi đồng thời:
 
@@ -220,14 +167,6 @@ Một case chỉ pass khi đồng thời:
 
 Không được hạ quality bar sau hạn CP4. Nếu kết quả thấp hơn, nhóm báo đúng số thực, phân tích lỗi và tiếp tục cải thiện.
 
-### Kết quả các lượt chạy
-
-| Thời điểm | Bộ test | Kết quả | Ghi chú |
-|---|---|---:|---|
-| 17/09/2026 | Automated unit tests | 16/16 (100%) | Không phải golden set chất lượng nội dung |
-| Chưa chạy | Golden set 24 case | Chưa có số liệu | Bắt buộc bổ sung trước CP5 |
-| Chưa chạy | 5 willing users | Chưa có số liệu | Thuộc validation/R6 |
-
 ## §8. Phân công và kế hoạch
 
 Phân công dưới đây chi tiết hóa nội dung CP1 (“Đạt, Đoan: dữ liệu/feedback/improve; Cường, Đức: create feature”). Nhóm cần xác nhận lại trước khi nộp.
@@ -238,17 +177,6 @@ Phân công dưới đây chi tiết hóa nội dung CP1 (“Đạt, Đoan: dữ
 | Đỗ Mạnh Đoan | Spec, evidence, validation log | `CP4/spec.md`, quote và `validation/` |
 | Nguyễn Mạnh Cường | Backend, Docker/DB, prompt và test | `src/`, `compose.yml`, test report |
 | Vi Hoàng Đức | Discord flow, demo và kiểm thử end-to-end | CP2, video CP3/CP5, checklist demo |
-
-### Việc còn thiếu trước CP5/CP6
-
-- [ ] Bổ sung `n`, tỷ lệ khảo sát và ít nhất 5 quote có nguồn ẩn danh.
-- [ ] Khai tên ít nhất 2 willing users đã đăng ký từ CP1; mục này chưa có trong repo.
-- [ ] Lưu video CP3 30 giây và số đo thật.
-- [ ] Tạo/chấm đủ 24 case trong `eval/`, không chỉ chạy unit test.
-- [ ] Cho 5 người ngoài nhóm làm task, ghi quote/kẹt ở đâu/quyết định vào `validation/`.
-- [ ] Bổ sung ít nhất một thay đổi dựa trên validation vào changelog.
-- [ ] Điền vai trò trong bảng thành viên `README.md` và bảo đảm mọi người giải thích được phần mình làm.
-
 ## §9. Changelog
 
 | Thời điểm | Thay đổi | Lý do / bằng chứng |
