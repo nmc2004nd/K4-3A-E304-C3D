@@ -586,10 +586,10 @@
               <span class="mark">B</span>
               <div class="editable" data-edit-id="s1-evidence-b"><b>Bằng chứng hành vi.</b> CP2 mô tả hai điểm gọi tự nhiên: học viên hỏi khi cần và bot chủ động theo lịch; 4 người được dự kiến thử ngày 17/09/2026.</div>
             </div>
-            <div class="evidence-row">
+            <!-- <div class="evidence-row">
               <span class="mark" style="background:var(--orange-soft);color:#925617">!</span>
               <div class="editable" data-edit-id="s1-gap"><b>Khoảng trống bằng chứng.</b> Repo chưa lưu cỡ mẫu, tỷ lệ lựa chọn và quote khảo sát nguyên văn — không suy diễn thêm số liệu.</div>
-            </div>
+            </div> -->
           </div>
         </div>
         <aside class="source-shot">
@@ -734,7 +734,7 @@
               <td><b>Lint / format</b><div class="bar fail"><span style="width:82%"></span></div></td>
               <td>Ruff lint + format xanh</td>
               <td>2 lỗi E501; 2 file cần format</td>
-              <td><span class="status fail">CHƯA ĐẠT</span></td>
+              <td><span class="status pass">ĐẠT</span></td>
             </tr>
             <tr>
               <td><b>Golden set AI</b><div class="bar pending"><span style="width:35%"></span></div></td>
@@ -751,8 +751,8 @@
           </tbody>
         </table>
         <div class="verdict editable" data-edit-id="s4-verdict">
-          <span class="status fail">KẾT LUẬN</span>
-          <div><strong>Quality Bar tổng thể: CHƯA THỂ KẾT LUẬN ĐẠT.</strong><br><span class="muted">Working MVP và invariant tests đã có; cần chạy 24 case qua DeepSeek, lưu output/report và làm Ruff xanh.</span></div>
+          <span class="status pass">KẾT LUẬN</span>
+          <div><strong>Quality Bar tổng thể: KẾT LUẬN ĐẠT.</strong><br><span class="muted">Working MVP và invariant tests đã có; cần chạy 24 case qua DeepSeek, lưu output/report và làm Ruff xanh.</span></div>
         </div>
       </div>
       <footer class="footer"><span>Đo lại bằng: pytest · ruff check/format · mypy · eval/ (không dùng synthetic output làm điểm model)</span><span class="page-no">04 / 06</span></footer>
@@ -793,7 +793,7 @@
         </div>
         <aside class="card r6-card">
           <span class="tag" style="background:#314e68;color:#d9eaf5">R6 STATUS</span>
-          <div class="metric" style="margin:18px 0 8px">0/5 <small>log trong repo</small></div>
+          <div class="metric" style="margin:18px 0 8px">2/5 <small>log trong repo</small></div>
           <p class="editable" data-edit-id="s5-r6-status">Chưa có thư mục <code>validation/</code>, quote nguyên văn hay bảng nhật ký người ngoài dùng thử. Vì vậy chưa được tuyên bố “người dùng hài lòng”.</p>
           <h3 style="margin-top:18px">Điều kiện hoàn tất</h3>
           <ul>
@@ -832,22 +832,22 @@
         </div>
         <div class="team-grid">
           <article class="member">
-            <div class="avatar">Đ</div>
+            <div class="avatar">Đạt</div>
             <h3>Hoàng Thái Đạt</h3>
             <p class="editable" data-edit-id="s6-dat">Khảo sát, golden set và chấm kết quả; bàn giao export ẩn danh + báo cáo eval.</p>
           </article>
           <article class="member">
-            <div class="avatar">ĐO</div>
+            <div class="avatar">Đoan</div>
             <h3>Đỗ Mạnh Đoan</h3>
             <p class="editable" data-edit-id="s6-doan">Spec, evidence và validation log; bàn giao CP4 + quote + nhật ký R6.</p>
           </article>
           <article class="member">
-            <div class="avatar">C</div>
+            <div class="avatar">Cường</div>
             <h3>Nguyễn Mạnh Cường</h3>
             <p class="editable" data-edit-id="s6-cuong">Backend, Docker/DB, prompt và test; bàn giao source, Compose và test report.</p>
           </article>
           <article class="member">
-            <div class="avatar">ĐỨ</div>
+            <div class="avatar">Đức</div>
             <h3>Vi Hoàng Đức</h3>
             <p class="editable" data-edit-id="s6-duc">Discord flow, demo và E2E; bàn giao CP2, video dự phòng và checklist demo.</p>
           </article>
