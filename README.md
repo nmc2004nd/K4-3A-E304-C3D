@@ -29,14 +29,14 @@ milestone công khai lúc 09:00, 14:00 và 21:00 theo múi giờ cấu hình.
 
 ## 👥 Thành viên nhóm & Phân công vai trò
 
-**Lớp:** 3A · **Phòng:** ____ · **Cụm:** ____ · **Track:** ____
+**Lớp:** 3A · **Phòng:** E403 · **Cụm:** (Zone 2) · **Track:** B: Trợ lý Discord
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| Nguyễn Mạnh Cường | 2A202602823 |  |  |
-| Đỗ Mạnh Đoan | 2A202602839 |  |  |
-| Hoàng Thái Đạt | 2A202602959 |  |  |
-| Vi Hoàng Đức | 2A202602512 |  |  |
+| Nguyễn Mạnh Cường | 2A202602823 | Dev | Backend, Docker/DB, prompt và test |
+| Đỗ Mạnh Đoan | 2A202602839 | Kiểm thử | Spec, evidence, valid log |
+| Hoàng Thái Đạt | 2A202602959 | Khảo sát, test | Khảo sát, golden set, chấm kết quả |
+| Vi Hoàng Đức | 2A202602512 | Thiết kế, demo | Discord flow, demo, kiểm thử e2e |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
