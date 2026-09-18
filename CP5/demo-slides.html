@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bài thuyết trình 6 trang cho Classroom AI Summary Bot — nhóm C3D">
+  <title>Classroom AI Summary Bot — Demo Slides</title>
+  <style>
+    :root {
+      --ink: #102a43;
+      --ink-soft: #486581;
+      --paper: #f7f3eb;
+      --white: #fffdf8;
+      --teal: #27a58c;
+      --teal-soft: #dff4ee;
+      --orange: #f2994a;
+      --orange-soft: #fff0df;
+      --blue: #2478bd;
+      --blue-soft: #e5f1fb;
+      --red: #d8594c;
+      --red-soft: #fae9e6;
+      --violet: #7566c9;
+      --line: #d8e0e8;
+      --shadow: 0 26px 70px rgba(16, 42, 67, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #dce5eb;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    body { overflow: hidden; }
+
+    button { font: inherit; }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+    }
+
+    .slide {
+      position: absolute;
+      width: min(calc(100vw - 44px), calc((100vh - 44px) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      display: none;
+      grid-template-rows: auto 1fr auto;
+      padding: clamp(28px, 3.1vw, 54px) clamp(34px, 4.4vw, 76px) 28px;
+      background:
+        radial-gradient(circle at 95% 4%, rgba(39, 165, 140, 0.14), transparent 26%),
+        linear-gradient(135deg, var(--white), var(--paper));
+      border: 1px solid rgba(16, 42, 67, 0.12);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .slide.active { display: grid; animation: enter 280ms ease-out; }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(8px) scale(0.995); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 9px;
+      background: linear-gradient(var(--teal), var(--blue));
+    }
+
+    .slide::after {
+      content: attr(data-watermark);
+      position: absolute;
+      right: -10px;
+      bottom: -42px;
+      color: rgba(16, 42, 67, 0.035);
+      font-size: clamp(116px, 15vw, 230px);
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--blue);
+      font-size: clamp(10px, 0.85vw, 14px);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 22px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--orange);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1, h2 {
+      max-width: 1100px;
+      margin-bottom: clamp(14px, 1.4vw, 24px);
+      font-size: clamp(34px, 4.1vw, 66px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: clamp(16px, 1.35vw, 23px);
+      line-height: 1.15;
+    }
+
+    p, li, td, th {
+      font-size: clamp(11px, 1.03vw, 17px);
+      line-height: 1.42;
+    }
+
+    .lead {
+      max-width: 1040px;
+      color: var(--ink-soft);
+      font-size: clamp(15px, 1.5vw, 25px);
+      line-height: 1.35;
+    }
+
+    .content { min-height: 0; position: relative; z-index: 1; }
+
+    .footer {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid rgba(16, 42, 67, 0.13);
+      color: var(--ink-soft);
+      font-size: clamp(9px, 0.72vw, 12px);
+    }
+
+    .footer b { color: var(--ink); }
+    .page-no { font-weight: 900; letter-spacing: 0.12em; }
+
+    .grid-2 { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(16px, 2vw, 34px); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 1.4vw, 22px); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.1vw, 18px); }
+
+    .card {
+      position: relative;
+      padding: clamp(14px, 1.5vw, 24px);
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      box-shadow: 0 8px 24px rgba(16, 42, 67, 0.06);
+    }
+
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+
+    .tag, .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: clamp(9px, 0.72vw, 12px);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .tag { color: #146b5b; background: var(--teal-soft); }
+    .status.pass { color: #146b5b; background: var(--teal-soft); }
+    .status.pending { color: #925617; background: var(--orange-soft); }
+    .status.fail { color: #9f3129; background: var(--red-soft); }
+    .status.info { color: #15598f; background: var(--blue-soft); }
+
+    .metric {
+      font-size: clamp(30px, 3.6vw, 58px);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+    }
+
+    .metric small {
+      font-size: 0.34em;
+      letter-spacing: 0;
+      color: var(--ink-soft);
+    }
+
+    .muted { color: var(--ink-soft); }
+    .accent { color: var(--teal); }
+    .orange { color: var(--orange); }
+    .danger { color: var(--red); }
+
+    .problem {
+      margin: 18px 0 22px;
+      padding: 18px 22px;
+      background: var(--ink);
+      color: white;
+      border-radius: 18px;
+      font-size: clamp(16px, 1.55vw, 25px);
+      line-height: 1.35;
+    }
+
+    .evidence-list { display: grid; gap: 10px; }
+    .evidence-row {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      align-items: start;
+      gap: 10px;
+    }
+
+    .evidence-row .mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--teal-soft);
+      color: #13705e;
+      font-weight: 900;
+    }
+
+    .source-shot {
+      min-height: 100%;
+      overflow: hidden;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .source-shot img {
+      width: 100%;
+      height: 64%;
+      display: block;
+      object-fit: cover;
+      object-position: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .source-caption { padding: 14px 16px; }
+    .source-caption p { margin: 7px 0 0; }
+
+    .one-liner {
+      margin: 2px 0 clamp(17px, 2vw, 30px);
+      padding-left: 20px;
+      border-left: 7px solid var(--orange);
+      font-size: clamp(18px, 2vw, 32px);
+      font-weight: 750;
+      line-height: 1.26;
+      letter-spacing: -0.02em;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 1fr auto 1.25fr auto 1fr;
+      align-items: stretch;
+      gap: clamp(8px, 1vw, 16px);
+    }
+
+    .arch-stage {
+      padding: clamp(14px, 1.5vw, 24px);
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .arch-stage .num {
+      display: inline-grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      margin-bottom: 10px;
+      border-radius: 9px;
+      background: var(--ink);
+      color: white;
+      font-weight: 900;
+    }
+
+    .arch-stage:nth-child(1) { border-top: 5px solid var(--blue); }
+    .arch-stage:nth-child(3) { border-top: 5px solid var(--violet); }
+    .arch-stage:nth-child(5) { border-top: 5px solid var(--teal); }
+
+    .arch-arrow { display: grid; place-items: center; color: var(--orange); font-size: 30px; font-weight: 900; }
+
+    ul.clean {
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    ul.clean li { position: relative; margin: 7px 0; padding-left: 16px; }
+    ul.clean li::before { content: "•"; position: absolute; left: 0; color: var(--teal); font-weight: 900; }
+
+    .invariant {
+      margin-top: clamp(14px, 1.5vw, 24px);
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      border-radius: 14px;
+      background: #102a43;
+      color: white;
+      font-size: clamp(11px, 0.95vw, 16px);
+    }
+
+    .invariant code { color: #8ee0ce; font-weight: 800; }
+
+    .hard-layer {
+      min-height: 255px;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(13px, 1.3vw, 21px);
+      border-radius: 17px;
+      color: white;
+    }
+
+    .hard-layer:nth-child(1) { background: #176b87; }
+    .hard-layer:nth-child(2) { background: #6655b5; }
+    .hard-layer:nth-child(3) { background: #b9652c; }
+    .hard-layer:nth-child(4) { background: #246c5b; }
+
+    .layer-no { opacity: 0.62; font-size: 12px; font-weight: 900; letter-spacing: 0.16em; }
+    .hard-layer h3 { margin-top: 8px; font-size: clamp(18px, 1.5vw, 25px); }
+    .hard-layer .risk { min-height: 45px; color: rgba(255, 255, 255, 0.76); }
+    .hard-layer ul { margin: auto 0 0; padding-left: 17px; }
+    .hard-layer li { margin: 5px 0; font-size: clamp(10px, 0.86vw, 14px); }
+
+    .ux-outcome {
+      margin-top: 14px;
+      padding: 13px 17px;
+      border-radius: 14px;
+      background: white;
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      text-align: center;
+      font-size: clamp(11px, 0.96vw, 16px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+
+    th, td {
+      padding: clamp(8px, 0.85vw, 14px) clamp(9px, 1vw, 16px);
+      text-align: left;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      color: white;
+      background: var(--ink);
+      font-size: clamp(9px, 0.78vw, 13px);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .bar {
+      width: 100%;
+      height: 8px;
+      margin-top: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e4e9ee;
+    }
+
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: var(--teal); }
+    .bar.pending > span { background: var(--orange); }
+    .bar.fail > span { background: var(--red); }
+
+    .verdict {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 15px;
+      align-items: center;
+      margin-top: 13px;
+      padding: 12px 16px;
+      border: 1px solid #edb4ae;
+      border-radius: 14px;
+      background: var(--red-soft);
+    }
+
+    .verdict strong { font-size: clamp(16px, 1.4vw, 23px); }
+
+    .failure-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: clamp(15px, 1.8vw, 28px);
+    }
+
+    .failure-list { display: grid; gap: 9px; }
+    .failure-item {
+      display: grid;
+      grid-template-columns: 112px 1fr 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .failure-item b { font-size: clamp(10px, 0.9vw, 15px); }
+    .failure-item span { font-size: clamp(9px, 0.78vw, 13px); line-height: 1.35; }
+    .failure-item .lesson { color: #146b5b; }
+
+    .r6-card {
+      height: 100%;
+      color: white;
+      background: var(--ink);
+      border: none;
+    }
+
+    .r6-card .metric { color: #ffd29f; }
+    .r6-card ul { padding-left: 18px; }
+    .r6-card li { margin: 8px 0; font-size: clamp(10px, 0.86vw, 14px); }
+
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 13px;
+      margin-bottom: 16px;
+    }
+
+    .roadmap .card { padding: 14px 17px; }
+    .roadmap .card:nth-child(1) { border-top: 5px solid var(--red); }
+    .roadmap .card:nth-child(2) { border-top: 5px solid var(--orange); }
+    .roadmap .card:nth-child(3) { border-top: 5px solid var(--teal); }
+    .roadmap p { margin: 5px 0 0; }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 11px;
+    }
+
+    .member {
+      padding: 14px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--line);
+    }
+
+    .avatar {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      margin-bottom: 9px;
+      border-radius: 12px;
+      color: white;
+      background: var(--ink);
+      font-weight: 900;
+    }
+
+    .member h3 { font-size: clamp(13px, 1.1vw, 18px); }
+    .member p { margin: 0; font-size: clamp(9px, 0.76vw, 13px); }
+
+    .controls {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      z-index: 30;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(16, 42, 67, 0.92);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(10px);
+    }
+
+    .controls button {
+      min-width: 38px;
+      height: 38px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      background: rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .controls button:hover { background: rgba(255, 255, 255, 0.22); }
+    .controls button.active { color: #103c33; background: #8ee0ce; }
+
+    .progress {
+      min-width: 54px;
+      color: white;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .edit-hint {
+      position: fixed;
+      left: 24px;
+      bottom: 24px;
+      z-index: 31;
+      display: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: white;
+      background: var(--orange);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    body.editing .edit-hint { display: block; }
+    body.editing .editable { outline: 2px dashed var(--orange); outline-offset: 4px; border-radius: 4px; }
+
+    @media (max-width: 900px), (max-height: 600px) {
+      .deck { padding: 6px; }
+      .slide { width: min(calc(100vw - 12px), calc((100vh - 12px) * 16 / 9)); padding: 22px 28px 16px; border-radius: 14px; }
+      .controls { right: 10px; bottom: 8px; transform: scale(0.86); transform-origin: bottom right; }
+    }
+
+    @media print {
+      @page { size: 13.333in 7.5in; margin: 0; }
+      html, body { width: auto; height: auto; background: white; overflow: visible; }
+      .deck { display: block; width: auto; height: auto; padding: 0; }
+      .slide, .slide.active {
+        position: relative;
+        display: grid;
+        width: 13.333in;
+        height: 7.5in;
+        aspect-ratio: auto;
+        padding: 0.42in 0.62in 0.25in;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        animation: none;
+        page-break-after: always;
+        break-after: page;
+      }
+      .slide:last-child { page-break-after: auto; }
+      .controls, .edit-hint { display: none !important; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Bài thuyết trình Classroom AI Summary Bot">
+    <section class="slide active" data-slide="1" data-watermark="01">
+      <header>
+        <div class="eyebrow">CP1 · Bằng chứng &amp; impact</div>
+        <h1 class="editable" data-edit-id="s1-title">Bỏ lỡ một buổi chat,<br>không bỏ lỡ việc cần làm</h1>
+      </header>
+      <div class="content grid-2">
+        <div>
+          <p class="lead editable" data-edit-id="s1-lead">Học viên quay lại Discord phải tự đọc một chuỗi hội thoại dài để tìm chủ đề, hướng dẫn, deadline và câu hỏi còn mở.</p>
+          <div class="problem editable" data-edit-id="s1-problem"><b>Bài toán:</b> thông tin quan trọng bị trôi; tìm kiếm chỉ trả lại tin nhắn, chưa giúp người học hiểu “điều gì đáng chú ý và tôi cần làm gì tiếp theo?”.</div>
+          <div class="evidence-list">
+            <div class="evidence-row">
+              <span class="mark">A</span>
+              <div class="editable" data-edit-id="s1-evidence-a"><b>Bằng chứng trực tiếp.</b> CP1 ghi nhận khảo sát người dùng thật đã dùng “Trợ lý Kute”; nhu cầu là tóm tắt nội dung/sự kiện nổi bật trong ngày.</div>
+            </div>
+            <div class="evidence-row">
+              <span class="mark">B</span>
+              <div class="editable" data-edit-id="s1-evidence-b"><b>Bằng chứng hành vi.</b> CP2 mô tả hai điểm gọi tự nhiên: học viên hỏi khi cần và bot chủ động theo lịch; 4 người được dự kiến thử ngày 17/09/2026.</div>
+            </div>
+            <div class="evidence-row">
+              <span class="mark" style="background:var(--orange-soft);color:#925617">!</span>
+              <div class="editable" data-edit-id="s1-gap"><b>Khoảng trống bằng chứng.</b> Repo chưa lưu cỡ mẫu, tỷ lệ lựa chọn và quote khảo sát nguyên văn — không suy diễn thêm số liệu.</div>
+            </div>
+          </div>
+        </div>
+        <aside class="source-shot">
+          <img src="../CP1/Canva1.jpg" alt="Canvas khảo sát CP1 của nhóm C3D">
+          <div class="source-caption editable" data-edit-id="s1-caption">
+            <span class="tag">Canvas CP1</span>
+            <p><b>JTBD:</b> Khi quay lại channel sau một khoảng vắng mặt, học viên muốn nắm nhanh nội dung quan trọng để quyết định đọc hoặc hành động tiếp ở đâu.</p>
+          </div>
+        </aside>
+      </div>
+      <footer class="footer"><span>Nguồn: CP1/Canva1.jpg · CP4/spec.md §1</span><span class="page-no">01 / 06</span></footer>
+    </section>
+
+    <section class="slide" data-slide="2" data-watermark="02">
+      <header>
+        <div class="eyebrow">CP2–CP3 · Lát cắt &amp; kiến trúc</div>
+        <h2 class="editable" data-edit-id="s2-title">Một lát cắt đủ nhỏ để chạy thật</h2>
+      </header>
+      <div class="content">
+        <div class="one-liner editable" data-edit-id="s2-one-liner">Một học viên quay lại channel đã opt-in, yêu cầu phần hội thoại mới và nhận bản tóm tắt tiếng Việt có căn cứ — riêng tư khi hỏi, công khai khi đến mốc.</div>
+        <div class="architecture">
+          <article class="arch-stage">
+            <span class="num">1</span>
+            <h3>Ingest liên tục</h3>
+            <p class="muted">Discord Gateway nhận create / edit / delete / reaction.</p>
+            <ul class="clean">
+              <li>Filter nhanh, không gọi LLM</li>
+              <li>Redis Stream theo channel</li>
+              <li>Không bỏ lỡ bản sửa/xóa</li>
+            </ul>
+          </article>
+          <div class="arch-arrow">→</div>
+          <article class="arch-stage">
+            <span class="num">2</span>
+            <h3>Process có giới hạn</h3>
+            <p class="muted">Chỉ chạy khi cron 09/14/21h hoặc <code>/summary now</code>.</p>
+            <ul class="clean">
+              <li>Normalize và REST fallback</li>
+              <li>Map 300–500 tin → Reduce</li>
+              <li>JSON schema + retry tối đa 3</li>
+            </ul>
+          </article>
+          <div class="arch-arrow">→</div>
+          <article class="arch-stage">
+            <span class="num">3</span>
+            <h3>Deliver đúng ngữ cảnh</h3>
+            <p class="muted">Một pipeline, hai trải nghiệm đầu ra.</p>
+            <ul class="clean">
+              <li>Cron: milestone công khai</li>
+              <li>On-demand: ephemeral fresh</li>
+              <li>Post gốc không bị sửa</li>
+            </ul>
+          </article>
+        </div>
+        <div class="invariant editable" data-edit-id="s2-invariant">
+          <b>🔒 Invariant:</b>
+          <code>cron + post_success → commit cursor</code>
+          <span>·</span>
+          <code>on-demand → never commit cursor</code>
+        </div>
+      </div>
+      <footer class="footer"><span>Nguồn: CP2 interaction flow · CP3 pipeline · instruction.md</span><span class="page-no">02 / 06</span></footer>
+    </section>
+
+    <section class="slide" data-slide="3" data-watermark="03">
+      <header>
+        <div class="eyebrow">R3 · Chỗ khó &amp; kịch bản rủi ro</div>
+        <h2 class="editable" data-edit-id="s3-title">Bốn lớp khó — bốn lớp bảo vệ trải nghiệm</h2>
+      </header>
+      <div class="content">
+        <div class="grid-4">
+          <article class="hard-layer">
+            <span class="layer-no">LỚP 01</span>
+            <h3>Dữ liệu đúng</h3>
+            <p class="risk">Tin sửa, xóa, trùng hoặc stream bị trim có thể làm summary sai nguồn.</p>
+            <ul>
+              <li>Gateway bắt đủ event</li>
+              <li>Dedupe, giữ edit mới nhất</li>
+              <li>Loại deleted; REST fallback</li>
+            </ul>
+          </article>
+          <article class="hard-layer">
+            <span class="layer-no">LỚP 02</span>
+            <h3>AI đáng tin</h3>
+            <p class="risk">JSON lỗi, bịa deadline, lẫn chuyện cá nhân hoặc trả tiếng Anh.</p>
+            <ul>
+              <li>Pydantic schema + retry</li>
+              <li>Source message ID</li>
+              <li>Prompt tiếng Việt, lọc noise</li>
+            </ul>
+          </article>
+          <article class="hard-layer">
+            <span class="layer-no">LỚP 03</span>
+            <h3>Tương tác vừa đủ</h3>
+            <p class="risk">Bot spam channel, gọi AI vô ích hoặc admin phải cấu hình mơ hồ.</p>
+            <ul>
+              <li>Allow-list opt-in một lần</li>
+              <li>Ephemeral khi hỏi giữa mốc</li>
+              <li>Cache 240s + rate-limit 30s</li>
+            </ul>
+          </article>
+          <article class="hard-layer">
+            <span class="layer-no">LỚP 04</span>
+            <h3>Vận hành an toàn</h3>
+            <p class="risk">Cron chồng nhau, Discord 429/post lỗi hoặc rò dữ liệu giữa channel.</p>
+            <ul>
+              <li>Redis lock theo channel</li>
+              <li>Tôn trọng <code>retry_after</code></li>
+              <li>Post lỗi → cursor đứng yên</li>
+            </ul>
+          </article>
+        </div>
+        <div class="ux-outcome editable" data-edit-id="s3-outcome"><b>Kết quả người dùng cảm nhận:</b> summary đúng phần mới, không lặp, không làm mất dữ liệu, không trộn channel và không làm ồn kênh chung.</div>
+      </div>
+      <footer class="footer"><span>Nguồn: CP4/spec.md §5–§6 · src/classroom_summary</span><span class="page-no">03 / 06</span></footer>
+    </section>
+
+    <section class="slide" data-slide="4" data-watermark="04">
+      <header>
+        <div class="eyebrow">R4 · Kết quả đối chiếu Quality Bar</div>
+        <h2 class="editable" data-edit-id="s4-title">Đo cái đã chạy — không tô xanh phần chưa đo</h2>
+      </header>
+      <div class="content">
+        <table aria-label="Bảng đo lường so với quality bar CP4">
+          <thead>
+            <tr><th>Hạng mục</th><th>Quality Bar đã khóa</th><th>Kết quả thực tế 18/09</th><th>Trạng thái</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Automated tests</b><div class="bar"><span style="width:100%"></span></div></td>
+              <td>Toàn bộ unit test xanh</td>
+              <td><b>16/16 pass</b> trong 0,36 giây</td>
+              <td><span class="status pass">ĐẠT</span></td>
+            </tr>
+            <tr>
+              <td><b>Type safety</b><div class="bar"><span style="width:100%"></span></div></td>
+              <td><code>mypy src</code> xanh</td>
+              <td><b>23 source files</b>, 0 issue</td>
+              <td><span class="status pass">ĐẠT</span></td>
+            </tr>
+            <tr>
+              <td><b>Lint / format</b><div class="bar fail"><span style="width:82%"></span></div></td>
+              <td>Ruff lint + format xanh</td>
+              <td>2 lỗi E501; 2 file cần format</td>
+              <td><span class="status fail">CHƯA ĐẠT</span></td>
+            </tr>
+            <tr>
+              <td><b>Golden set AI</b><div class="bar pending"><span style="width:35%"></span></div></td>
+              <td>≥ <b>21/24</b> case (87,5%)</td>
+              <td>24 case đã định nghĩa; <b>chưa có lượt chạy model được lưu</b></td>
+              <td><span class="status pending">CHƯA ĐO</span></td>
+            </tr>
+            <tr>
+              <td><b>Hard gates</b><div class="bar pending"><span style="width:55%"></span></div></td>
+              <td>100%: không bịa / cô lập channel / cursor</td>
+              <td>Cursor &amp; post có unit test; AI factuality/isolation chưa có report E2E</td>
+              <td><span class="status pending">MỘT PHẦN</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="verdict editable" data-edit-id="s4-verdict">
+          <span class="status fail">KẾT LUẬN</span>
+          <div><strong>Quality Bar tổng thể: CHƯA THỂ KẾT LUẬN ĐẠT.</strong><br><span class="muted">Working MVP và invariant tests đã có; cần chạy 24 case qua DeepSeek, lưu output/report và làm Ruff xanh.</span></div>
+        </div>
+      </div>
+      <footer class="footer"><span>Đo lại bằng: pytest · ruff check/format · mypy · eval/ (không dùng synthetic output làm điểm model)</span><span class="page-no">04 / 06</span></footer>
+    </section>
+
+    <section class="slide" data-slide="5" data-watermark="05">
+      <header>
+        <div class="eyebrow">R6 · Failure-driven learning</div>
+        <h2 class="editable" data-edit-id="s5-title">Mỗi lỗi thật buộc thiết kế rõ hơn</h2>
+      </header>
+      <div class="content failure-grid">
+        <div class="failure-list">
+          <div class="failure-item">
+            <b>401 từ AI API</b>
+            <span>Cấu hình trỏ OpenAI trong khi nhóm dùng DeepSeek.</span>
+            <span class="lesson"><b>→</b> Chuẩn hóa <code>AI_BASE_URL</code>, model và healthcheck.</span>
+          </div>
+          <div class="failure-item">
+            <b><code>summary_id = NULL</code></b>
+            <span>AI trả 200 nhưng transaction lưu items thất bại.</span>
+            <span class="lesson"><b>→</b> Gán ID trước khi insert và thêm regression test.</span>
+          </div>
+          <div class="failure-item">
+            <b>Output tiếng Anh</b>
+            <span>Summary đúng ý nhưng sai ngôn ngữ trải nghiệm.</span>
+            <span class="lesson"><b>→</b> Instruction tiếng Việt dùng chung + version prompt/cache.</span>
+          </div>
+          <div class="failure-item">
+            <b>Nhiễu chuyện cá nhân</b>
+            <span>Message hợp lệ kỹ thuật nhưng không phục vụ học tập vẫn lọt vào summary.</span>
+            <span class="lesson"><b>→</b> Bổ sung rule lọc noise; phải xác nhận bằng 4 case mixed-content.</span>
+          </div>
+          <div class="failure-item">
+            <b>Eval “đẹp” giả</b>
+            <span>Runner hiện chấm output kỳ vọng, chưa chấm output của model.</span>
+            <span class="lesson"><b>→</b> Tách fixture validation khỏi model evaluation để số đo có ý nghĩa.</span>
+          </div>
+        </div>
+        <aside class="card r6-card">
+          <span class="tag" style="background:#314e68;color:#d9eaf5">R6 STATUS</span>
+          <div class="metric" style="margin:18px 0 8px">0/5 <small>log trong repo</small></div>
+          <p class="editable" data-edit-id="s5-r6-status">Chưa có thư mục <code>validation/</code>, quote nguyên văn hay bảng nhật ký người ngoài dùng thử. Vì vậy chưa được tuyên bố “người dùng hài lòng”.</p>
+          <h3 style="margin-top:18px">Điều kiện hoàn tất</h3>
+          <ul>
+            <li>5 người ngoài nhóm; 2 người từ CP1</li>
+            <li>Giao task, quan sát, chép quote nguyên văn</li>
+            <li>Ghi điểm kẹt và quyết định sản phẩm</li>
+            <li>Ít nhất 1 thay đổi vào §9 Changelog</li>
+          </ul>
+        </aside>
+      </div>
+      <footer class="footer"><span>Nguồn: CP4 changelog · test_summary_repository.py · pipeline.py · README R6</span><span class="page-no">05 / 06</span></footer>
+    </section>
+
+    <section class="slide" data-slide="6" data-watermark="06">
+      <header>
+        <div class="eyebrow">Roadmap · Ownership</div>
+        <h2 class="editable" data-edit-id="s6-title">Từ working MVP đến sản phẩm có bằng chứng</h2>
+      </header>
+      <div class="content">
+        <div class="roadmap">
+          <article class="card editable" data-edit-id="s6-p0">
+            <span class="status fail">P0 · TRƯỚC DEMO</span>
+            <h3 style="margin-top:9px">Khóa bằng chứng chất lượng</h3>
+            <p>Chạy DeepSeek trên 24 case; lưu input/output/report; sửa Ruff; kiểm tra lại hard gates.</p>
+          </article>
+          <article class="card editable" data-edit-id="s6-p1">
+            <span class="status pending">P1 · R6</span>
+            <h3 style="margin-top:9px">Đưa cho người ngoài nhóm</h3>
+            <p>5 phiên task-based; tổng hợp quote, điểm kẹt và ít nhất một thay đổi có lý do.</p>
+          </article>
+          <article class="card editable" data-edit-id="s6-p2">
+            <span class="status pass">P2 · MỞ RỘNG</span>
+            <h3 style="margin-top:9px">Tăng kiểm soát &amp; quan sát</h3>
+            <p>Feedback 👍/👎, thread append, dashboard admin, token metrics và dead-letter queue.</p>
+          </article>
+        </div>
+        <div class="team-grid">
+          <article class="member">
+            <div class="avatar">Đ</div>
+            <h3>Hoàng Thái Đạt</h3>
+            <p class="editable" data-edit-id="s6-dat">Khảo sát, golden set và chấm kết quả; bàn giao export ẩn danh + báo cáo eval.</p>
+          </article>
+          <article class="member">
+            <div class="avatar">ĐO</div>
+            <h3>Đỗ Mạnh Đoan</h3>
+            <p class="editable" data-edit-id="s6-doan">Spec, evidence và validation log; bàn giao CP4 + quote + nhật ký R6.</p>
+          </article>
+          <article class="member">
+            <div class="avatar">C</div>
+            <h3>Nguyễn Mạnh Cường</h3>
+            <p class="editable" data-edit-id="s6-cuong">Backend, Docker/DB, prompt và test; bàn giao source, Compose và test report.</p>
+          </article>
+          <article class="member">
+            <div class="avatar">ĐỨ</div>
+            <h3>Vi Hoàng Đức</h3>
+            <p class="editable" data-edit-id="s6-duc">Discord flow, demo và E2E; bàn giao CP2, video dự phòng và checklist demo.</p>
+          </article>
+        </div>
+        <div class="invariant editable" data-edit-id="s6-close" style="margin-top:15px">
+          <b>Thông điệp chốt:</b> Kiến trúc đã chạy; ưu tiên tiếp theo là biến mỗi tuyên bố chất lượng thành một bằng chứng có thể kiểm tra lại.
+        </div>
+      </div>
+      <footer class="footer"><span>Nguồn: CP1 phân công · CP4 §8 · docs/SETUP.md · roadmap trong instruction.md</span><span class="page-no">06 / 06</span></footer>
+    </section>
+  </main>
+
+  <div class="edit-hint">Chế độ chỉnh sửa đang bật · nội dung tự lưu trên trình duyệt</div>
+  <nav class="controls" aria-label="Điều khiển slide">
+    <button type="button" id="prev" aria-label="Trang trước">←</button>
+    <span class="progress" id="progress">1 / 6</span>
+    <button type="button" id="next" aria-label="Trang sau">→</button>
+    <button type="button" id="edit" aria-label="Bật chỉnh sửa" title="Bật/tắt chỉnh sửa">✎ Sửa</button>
+    <button type="button" id="print" aria-label="In hoặc xuất PDF" title="In / Xuất PDF">⇩ PDF</button>
+    <button type="button" id="reset" aria-label="Khôi phục nội dung gốc" title="Xóa bản sửa đã lưu">↺</button>
+  </nav>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const editables = [...document.querySelectorAll('.editable')];
+      const progress = document.querySelector('#progress');
+      const editButton = document.querySelector('#edit');
+      let index = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+      let editing = false;
+
+      function show(nextIndex) {
+        index = (nextIndex + slides.length) % slides.length;
+        slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+        progress.textContent = `${index + 1} / ${slides.length}`;
+        history.replaceState(null, '', `#${index + 1}`);
+      }
+
+      function restoreEdits() {
+        editables.forEach((node) => {
+          const saved = localStorage.getItem(`c3d-slide:${node.dataset.editId}`);
+          if (saved !== null) node.innerHTML = saved;
+        });
+      }
+
+      function setEditing(value) {
+        editing = value;
+        document.body.classList.toggle('editing', editing);
+        editButton.classList.toggle('active', editing);
+        editButton.textContent = editing ? '✓ Xong' : '✎ Sửa';
+        editables.forEach((node) => node.setAttribute('contenteditable', editing ? 'true' : 'false'));
+      }
+
+      document.querySelector('#prev').addEventListener('click', () => show(index - 1));
+      document.querySelector('#next').addEventListener('click', () => show(index + 1));
+      editButton.addEventListener('click', () => setEditing(!editing));
+      document.querySelector('#print').addEventListener('click', () => window.print());
+      document.querySelector('#reset').addEventListener('click', () => {
+        if (!confirm('Xóa mọi chỉnh sửa đã lưu và khôi phục nội dung gốc?')) return;
+        editables.forEach((node) => localStorage.removeItem(`c3d-slide:${node.dataset.editId}`));
+        location.reload();
+      });
+
+      editables.forEach((node) => {
+        node.addEventListener('input', () => {
+          localStorage.setItem(`c3d-slide:${node.dataset.editId}`, node.innerHTML);
+        });
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (editing && event.target.closest('[contenteditable="true"]')) return;
+        if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); show(index + 1); }
+        if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); show(index - 1); }
+        if (event.key.toLowerCase() === 'e') setEditing(!editing);
+        if (event.key.toLowerCase() === 'p') window.print();
+        if (event.key === 'Home') show(0);
+        if (event.key === 'End') show(slides.length - 1);
+      });
+
+      window.addEventListener('hashchange', () => {
+        const target = Number(location.hash.slice(1));
+        if (target >= 1 && target <= slides.length) show(target - 1);
+      });
+
+      restoreEdits();
+      setEditing(false);
+      show(index);
+    })();
+  </script>
+</body>
+</html>
